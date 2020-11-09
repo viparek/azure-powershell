@@ -239,6 +239,7 @@ namespace Microsoft.Azure.Commands.Profile
 
         public override void ExecuteCmdlet()
         {
+            WriteDebug($"ExecuteCmdlet:1 thread id: {Thread.CurrentThread.ManagedThreadId}");
             Guid subscrptionIdGuid;
             string subscriptionName = null;
             string subscriptionId = null;
@@ -374,6 +375,7 @@ namespace Microsoft.Azure.Commands.Profile
 
                 SetContextWithOverwritePrompt((localProfile, profileClient, name) =>
                {
+                   WriteDebug($"ExecuteCmdlet:2 thread id: {Thread.CurrentThread.ManagedThreadId}");
                    bool shouldPopulateContextList = true;
                    if (this.IsParameterBound(c => c.SkipContextPopulation))
                    {
@@ -404,6 +406,7 @@ namespace Microsoft.Azure.Commands.Profile
 
                    try
                    {
+                       WriteDebug($"ExecuteCmdlet:3 thread id: {Thread.CurrentThread.ManagedThreadId}");
                        var result = (PSAzureProfile)task.Result;
                        WriteObject(result);
                    }
