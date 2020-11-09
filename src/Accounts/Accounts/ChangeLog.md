@@ -18,6 +18,8 @@
         - Additional information about change #1
 -->
 ## Upcoming Release
+
+## Version 2.1.3
 * Fixed an issue causing `Connect-AzAccount -KeyVaultAccessToken` not working [#13127]
 * Fixed null reference and method case insensitive in `Invoke-AzRestMethod`
 
