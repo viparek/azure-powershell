@@ -1,4 +1,4 @@
-name: LocalRepo_$(BuildDefinitionName)_$(Date:yyyyMMdd)$(Rev:.rr)
+name: SmokeTest_$(GalleryName)
 pr: none
 trigger: none
 
