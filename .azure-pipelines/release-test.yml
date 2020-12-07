@@ -1,4 +1,4 @@
-name: SmokeTest_$(GalleryName)
+name: $(rev:.r)
 pr: none
 trigger: none
 
