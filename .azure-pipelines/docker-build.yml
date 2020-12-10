@@ -17,14 +17,21 @@ pool:
   vmImage: ubuntu-18.04
 
 stages:
-- stage: Build & Push to Internal
-  variables:    # stage-level
+- stage: Build
+  variables:
     Build_Date: ''
   jobs:
   - job: BuildJob
     steps:
-    - script: echo Building!
-- stage: Test
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+          $date = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH-mm-ssZ")
+          Write-Host "##vso[task.setvariable variable=Build_Date]$date"
+        pwsh: true
+
+- stage: Staging
   jobs:
   - job: TestOnWindows
     steps:
@@ -32,7 +39,7 @@ stages:
   - job: TestOnLinux
     steps:
     - script: echo Testing on Linux!
-- stage: Deploy
+- stage: Publish
   jobs:
   - job: Deploy
     steps:
