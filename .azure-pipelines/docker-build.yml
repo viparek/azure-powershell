@@ -1,0 +1,39 @@
+# Please don't use ADO UI defined scheduled triggers because it takes precedence over YAML scheduled triggers.
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/process/scheduled-triggers
+name: Docker Release - Az$(Version) $(Date:MMdd) v.$(rev:r)
+
+variables:
+  ACR: ''
+  ACR_Account: ''
+  ACR_Server: ''
+  AzVersion: $(Version)
+  Latest: false
+  Version: 3.3.0
+
+pr: none
+trigger: none
+
+pool:
+  vmImage: ubuntu-18.04
+
+stages:
+- stage: Build & Push to Internal
+  variables:    # stage-level
+    Build_Date: ''
+  jobs:
+  - job: BuildJob
+    steps:
+    - script: echo Building!
+- stage: Test
+  jobs:
+  - job: TestOnWindows
+    steps:
+    - script: echo Testing on Windows!
+  - job: TestOnLinux
+    steps:
+    - script: echo Testing on Linux!
+- stage: Deploy
+  jobs:
+  - job: Deploy
+    steps:
+    - script: echo Deploying the code!
