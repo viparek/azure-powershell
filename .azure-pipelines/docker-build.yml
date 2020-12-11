@@ -1,6 +1,6 @@
 # Please don't use ADO UI defined scheduled triggers because it takes precedence over YAML scheduled triggers.
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/process/scheduled-triggers
-name: Docker Release - Az$(Version) $(Date:MMdd) v.$(rev:r)
+name: Docker Release - Az$(Version) 
 
 variables:
   ACR: ''
@@ -17,28 +17,51 @@ pool:
   vmImage: ubuntu-18.04
 
 stages:
-- stage: Build
+- stage: "Build"
   variables:
     Build_Date: ''
   jobs:
   - job: BuildJob
     steps:
     - task: PowerShell@2
+      displayName: "Get Current Date"
       inputs:
         targetType: 'inline'
         script: |
           $date = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH-mm-ssZ")
           Write-Host "##vso[task.setvariable variable=Build_Date]$date"
+          Write-Host "this is a test"
         pwsh: true
+    - task: Docker@2
+      displayName: "Ubuntu - Build"
+      inputs:
+        containerRegistry: $(ACR)
+        repository: 'internal/azure-powershell'
+        command: 'build'
+        Dockerfile: '$(System.DefaultWorkingDirectory)/azure-powershell/docker/Dockerfile-ubuntu-18.04'
+        buildContext: '$(System.DefaultWorkingDirectory)/azure-powershell/docker'
+        tags: '$(Version)-ubuntu-18.04'
+        arguments: '--build-arg VERSION=$(AzVersion) --build-arg BUILD_DATE="$(Build_Date)"'
+        addPipelineData: false
+    - task: Docker@2
+      displayName: "Ubuntu - Push"
+      inputs:
+        containerRegistry: $(ACR)
+        repository: 'internal/azure-powershell'
+        command: 'push'
+        tags: '$(Version)-ubuntu-18.04'
+        addPipelineData: false
 
 - stage: Staging
   jobs:
-  - job: TestOnWindows
+  - job: Test
     steps:
-    - script: echo Testing on Windows!
-  - job: TestOnLinux
-    steps:
-    - script: echo Testing on Linux!
+    - script: echo Deploying the code!
+    - task: ManualValidation@0
+      displayName: "Waiting for manual validation"
+      inputs:
+        notifyUsers: 'dixue'
+
 - stage: Publish
   jobs:
   - job: Deploy
