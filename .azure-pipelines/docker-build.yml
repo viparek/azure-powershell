@@ -14,7 +14,8 @@ parameters:
   - name: azVersion
     displayName: Az version
     type: string
-    default: ''
+    default: 
+
 
 pr: none
 trigger: none
