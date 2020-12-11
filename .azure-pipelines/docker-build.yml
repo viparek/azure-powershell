@@ -2,13 +2,31 @@
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/process/scheduled-triggers
 name: Docker Release - Az$(Version) 
 
-variables:
-  ACR: 'azureps-acr-dev'
-  ACR_Account: ''
-  ACR_Server: ''
-  AzVersion: $(Version)
-  Latest: false
-  Version: 3.3.0
+parameters:
+  - name: latest
+    displayName: Is latest Az?
+    type: boolean
+    default: yes
+  - name: version
+    displayName: Docker version
+    type: string
+    default: 3.3.0
+  - name: azVersion
+    displayName: Az version
+    type: string
+    default: $(version)
+  - name: ACRAccount
+    displayName: ACR User Account
+    type: string
+    default: azurepsdev
+  - name: ACRServer
+    displayName: ACR Server
+    type: string
+    default: azurepsdev.azurecr.io
+  - name: ACRConnection
+    displayName: ACR Connection
+    type: string
+    default: azureps-acr-dev
 
 pr: none
 trigger: none
@@ -24,46 +42,66 @@ stages:
   - job: BuildJob
     steps:
     - task: PowerShell@2
-      displayName: "Get Current Date"
+      displayName: Get Current Date
       inputs:
         targetType: 'inline'
         script: |
           $date = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH-mm-ssZ")
+          Write-Host $date
           Write-Host "##vso[task.setvariable variable=Build_Date]$date"
           Write-Host "this is a test"
         pwsh: true
     - task: Docker@2
       displayName: "Ubuntu - Build"
       inputs:
-        containerRegistry: $(ACR)
+        containerRegistry: $(ACRConnection)
         repository: 'internal/azure-powershell'
         command: 'build'
         Dockerfile: '$(System.DefaultWorkingDirectory)/docker/Dockerfile-ubuntu-18.04'
         buildContext: '$(System.DefaultWorkingDirectory)/docker'
         tags: '$(Version)-ubuntu-18.04'
-        arguments: '--build-arg VERSION=$(AzVersion) --build-arg BUILD_DATE="$(Build_Date)"'
+        arguments: '--build-arg VERSION=$(azVersion) --build-arg BUILD_DATE="$(Build_Date)"'
         addPipelineData: false
     - task: Docker@2
       displayName: "Ubuntu - Push"
       inputs:
-        containerRegistry: $(ACR)
+        containerRegistry: $(ACRConnection)
         repository: 'internal/azure-powershell'
         command: 'push'
-        tags: '$(Version)-ubuntu-18.04'
+        tags: '$(version)-ubuntu-18.04'
         addPipelineData: false
 
 - stage: Validation
   jobs:
   - job: Test
     pool: server
+    cancelTimeoutInMinutes: 180
     steps:
     - task: ManualValidation@0
-      displayName: "Waiting for manual validation"
+      displayName: Waiting for manual validation
       inputs:
-        notifyUsers: 'dixue'
+        notifyUsers: 'dixue@microsoft.com'
 
 - stage: Publish
   jobs:
   - job: Deploy
     steps:
-    - script: echo Deploying the code!
+    - task: AzureCLI@1
+      displayName: Push to public
+      inputs:
+        azureSubscription: 'SDKInfrastructureSP'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az acr login --name $(ACRAccount)
+          
+          docker pull $(ACRServer)/internal/azure-powershell:$(Version)-ubuntu-18.04
+          docker tag $(ACRServer)/internal/azure-powershell:$(Version)-ubuntu-18.04 $(ACRServer)/public/azure-powershell:$(Version)-ubuntu-18.04
+          docker push $(ACRServer)/public/azure-powershell:$(Version)-ubuntu-18.04
+          
+          if $(latest); then
+              docker tag $(ACRServer)/internal/azure-powershell:$(Version)-ubuntu-18.04 $(ACRServer)/public/azure-powershell
+              docker push $(ACRServer)/public/azure-powershell
+          
+              docker tag $(ACRServer)/internal/azure-powershell:$(Version)-ubuntu-18.04 $(ACRServer)/public/azure-powershell:ubuntu-18.04
+              docker push $(ACRServer)/public/azure-powershell:ubuntu-18.04
+          fi
