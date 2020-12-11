@@ -6,7 +6,7 @@ parameters:
   - name: latest
     displayName: Is latest Az?
     type: boolean
-    default: yes
+    default: false
   - name: version
     displayName: Docker version
     type: string
