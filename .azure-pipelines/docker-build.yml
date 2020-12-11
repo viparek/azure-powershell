@@ -3,7 +3,7 @@
 name: Docker Release - Az$(Version) 
 
 variables:
-  ACR: ''
+  ACR: 'azureps-acr-dev'
   ACR_Account: ''
   ACR_Server: ''
   AzVersion: $(Version)
