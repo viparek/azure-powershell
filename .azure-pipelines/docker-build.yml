@@ -14,7 +14,7 @@ parameters:
   - name: azVersion
     displayName: Az version
     type: string
-    default: ${{parameters.Version}}
+    default: ''
 
 pr: none
 trigger: none
@@ -35,10 +35,18 @@ stages:
         targetType: 'inline'
         script: |
           $date = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH-mm-ssZ")
-          Write-Host $date
           Write-Host "##vso[task.setvariable variable=Build_Date]$date"
-          Write-Host "this is a test"
+          Write-Host "Build_Date=$(Build_Date)"
         pwsh: true
+    - task: PowerShell@2
+      displayName: Get Az Version
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "##vso[task.setvariable variable=azVersion]$(version)"
+          Write-Host "azVersion=$(azVersion)"
+        pwsh: true
+      condition: and(succeeded(), qe($(azVersion), ''))
     - task: Docker@2
       displayName: "Ubuntu - Build"
       inputs:
@@ -97,4 +105,4 @@ stages:
 
           docker tag $(ACRServer)/internal/azure-powershell:${{parameters.Version}}-ubuntu-18.04 $(ACRServer)/public/azure-powershell:ubuntu-18.04
           docker push $(ACRServer)/public/azure-powershell:ubuntu-18.04
-      condition: and(succeeded(), ne(${{parameters.latest}}, 'true'))
+      condition: and(succeeded(), eq(${{parameters.latest}}, true))
