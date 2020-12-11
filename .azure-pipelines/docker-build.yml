@@ -52,11 +52,11 @@ stages:
         tags: '$(Version)-ubuntu-18.04'
         addPipelineData: false
 
-- stage: Staging
+- stage: Validation
   jobs:
   - job: Test
+    pool: server
     steps:
-    - script: echo Deploying the code!
     - task: ManualValidation@0
       displayName: "Waiting for manual validation"
       inputs:
