@@ -38,8 +38,8 @@ stages:
         containerRegistry: $(ACR)
         repository: 'internal/azure-powershell'
         command: 'build'
-        Dockerfile: '$(System.DefaultWorkingDirectory)/azure-powershell/docker/Dockerfile-ubuntu-18.04'
-        buildContext: '$(System.DefaultWorkingDirectory)/azure-powershell/docker'
+        Dockerfile: '$(System.DefaultWorkingDirectory)/docker/Dockerfile-ubuntu-18.04'
+        buildContext: '$(System.DefaultWorkingDirectory)/docker'
         tags: '$(Version)-ubuntu-18.04'
         arguments: '--build-arg VERSION=$(AzVersion) --build-arg BUILD_DATE="$(Build_Date)"'
         addPipelineData: false
