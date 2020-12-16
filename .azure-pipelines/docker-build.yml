@@ -7,14 +7,10 @@ parameters:
     displayName: Is latest Az?
     type: boolean
     default: false
-  - name: version
-    displayName: Docker version
-    type: string
-    default: 3.3.0
   - name: azVersion
     displayName: Az version
     type: string
-    default: 
+    default: 3.3.0
 
 
 pr: none
@@ -47,7 +43,6 @@ stages:
           Write-Host "##vso[task.setvariable variable=azVersion]$(version)"
           Write-Host "azVersion=$(azVersion)"
         pwsh: true
-      condition: and(succeeded(), qe($(azVersion), ''))
     - task: Docker@2
       displayName: "Ubuntu - Build"
       inputs:
@@ -56,7 +51,7 @@ stages:
         command: 'build'
         Dockerfile: '$(System.DefaultWorkingDirectory)/docker/Dockerfile-ubuntu-18.04'
         buildContext: '$(System.DefaultWorkingDirectory)/docker'
-        tags: '${{parameters.Version}}-ubuntu-18.04'
+        tags: '${{parameters.azVersion}}-ubuntu-18.04'
         arguments: '--build-arg VERSION=${{parameters.azVersion}} --build-arg BUILD_DATE="$(Build_Date)"'
         addPipelineData: false
     - task: Docker@2
@@ -65,7 +60,7 @@ stages:
         containerRegistry: $(ACRConnection)
         repository: 'internal/azure-powershell'
         command: 'push'
-        tags: '${{parameters.Version}}-ubuntu-18.04'
+        tags: '${{parameters.azVersion}}-ubuntu-18.04'
         addPipelineData: false
 
 - stage: Validation
@@ -91,9 +86,9 @@ stages:
         inlineScript: |
           az acr login --name $(ACRAccount)
           
-          docker pull $(ACRServer)/internal/azure-powershell:${{parameters.Version}}-ubuntu-18.04
-          docker tag $(ACRServer)/internal/azure-powershell:${{parameters.Version}}-ubuntu-18.04 $(ACRServer)/public/azure-powershell:${{parameters.Version}}-ubuntu-18.04
-          docker push $(ACRServer)/public/azure-powershell:${{parameters.Version}}-ubuntu-18.04
+          docker pull $(ACRServer)/internal/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04
+          docker tag $(ACRServer)/internal/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04 $(ACRServer)/public/azure-powershell:${{parameters.Version}}-ubuntu-18.04
+          docker push $(ACRServer)/public/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04
     - task: AzureCLI@1
       displayName: Tag Latest 
       inputs:
@@ -101,9 +96,9 @@ stages:
         scriptLocation: 'inlineScript'
         inlineScript: |
           az acr login --name $(ACRAccount)
-          docker tag $(ACRServer)/internal/azure-powershell:${{parameters.Version}}-ubuntu-18.04 $(ACRServer)/public/azure-powershell
+          docker tag $(ACRServer)/internal/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04 $(ACRServer)/public/azure-powershell
           docker push $(ACRServer)/public/azure-powershell
 
-          docker tag $(ACRServer)/internal/azure-powershell:${{parameters.Version}}-ubuntu-18.04 $(ACRServer)/public/azure-powershell:ubuntu-18.04
+          docker tag $(ACRServer)/internal/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04 $(ACRServer)/public/azure-powershell:ubuntu-18.04
           docker push $(ACRServer)/public/azure-powershell:ubuntu-18.04
       condition: and(succeeded(), eq(${{parameters.latest}}, true))
