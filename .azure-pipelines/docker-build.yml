@@ -1,6 +1,6 @@
 # Please don't use ADO UI defined scheduled triggers because it takes precedence over YAML scheduled triggers.
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/process/scheduled-triggers
-name: Docker Release - Az${{parameters.Version}} 
+name: Docker Release - Az${{parameters.azVersion}} 
 
 parameters:
   - name: latest
@@ -87,7 +87,7 @@ stages:
           az acr login --name $(ACRAccount)
           
           docker pull $(ACRServer)/internal/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04
-          docker tag $(ACRServer)/internal/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04 $(ACRServer)/public/azure-powershell:${{parameters.Version}}-ubuntu-18.04
+          docker tag $(ACRServer)/internal/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04 $(ACRServer)/public/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04
           docker push $(ACRServer)/public/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04
     - task: AzureCLI@1
       displayName: Tag Latest 
