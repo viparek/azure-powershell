@@ -25,7 +25,7 @@ pool:
 stages:
 - stage: "Build"
   variables:
-    Build_Date: $[format('{0:yyyy-MM-ddTHH-mm-ssZ}', pipeline.startTime)]
+    Build_Date: $[format('{0:yyyy-MM-dd}T{0:HH-mm-ss}Z', pipeline.startTime)]
   jobs:
   - job: BuildJob
     steps:
