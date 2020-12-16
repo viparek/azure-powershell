@@ -12,6 +12,9 @@ parameters:
     type: string
     default: 3.3.0
 
+variables:
+  - name: Build_Date
+  - name: azureSubscription
 
 pr: none
 trigger: none
@@ -22,19 +25,11 @@ pool:
 stages:
 - stage: "Build"
   variables:
-    Build_Date: ''
+    Build_Date: $[format('{0:yyyy-MM-ddTHH-mm-ssZ}', pipeline.startTime)]
   jobs:
   - job: BuildJob
     steps:
-    - task: PowerShell@2
-      displayName: Get Current Date
-      inputs:
-        targetType: 'inline'
-        script: |
-          $date = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH-mm-ssZ")
-          Write-Host "##vso[task.setvariable variable=Build_Date]$date"
-          Write-Host "Build_Date=$(Build_Date)"
-        pwsh: true
+    - bash: echo $(Build_Date)
     - task: Docker@2
       displayName: "Ubuntu - Build"
       inputs:
@@ -58,15 +53,21 @@ stages:
 - stage: Validation
   jobs:
   - job: Test
-    pool: server
     steps:
-    - task: ManualValidation@0
-      displayName: Waiting for manual validation
-      timeoutInMinutes: 180
+    - task: AzureCLI@1
+      displayName: Verify images
       inputs:
-        notifyUsers: 'dixue@microsoft.com'
-        instructions: 'Please verify compiled docker images.'
-        onTimeout: reject
+        azureSubscription: $(AzureSubscription)
+        scriptLocation: 'inlineScript'
+        failOnStandardError: true
+        inlineScript: |
+          az acr login --name $(ACRAccount)          
+          Set actualVersion = docker run -it $(ACRServer)/internal/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04 pwsh '(Get-Module Az -ListAvailable).Version.ToString()'
+          if [ "$actualVersion" = "${{parameters.azVersion}}" ]; then
+            echo "Strings are equal."
+          else
+            >&2 echo "error"
+          fi
 
 - stage: Publish
   jobs:
@@ -75,7 +76,7 @@ stages:
     - task: AzureCLI@1
       displayName: Push to public
       inputs:
-        azureSubscription: 'SDKInfrastructureSP'
+        azureSubscription: $(AzureSubscription)
         scriptLocation: 'inlineScript'
         inlineScript: |
           az acr login --name $(ACRAccount)
@@ -86,7 +87,7 @@ stages:
     - task: AzureCLI@1
       displayName: Tag Latest 
       inputs:
-        azureSubscription: 'SDKInfrastructureSP'
+        azureSubscription: $(AzureSubscription)
         scriptLocation: 'inlineScript'
         inlineScript: |
           az acr login --name $(ACRAccount)
