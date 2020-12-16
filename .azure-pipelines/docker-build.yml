@@ -59,7 +59,6 @@ stages:
   jobs:
   - job: Test
     pool: server
-    cancelTimeoutInMinutes: 180
     steps:
     - task: ManualValidation@0
       displayName: Waiting for manual validation
