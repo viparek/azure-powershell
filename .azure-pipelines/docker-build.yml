@@ -35,14 +35,6 @@ stages:
           Write-Host "##vso[task.setvariable variable=Build_Date]$date"
           Write-Host "Build_Date=$(Build_Date)"
         pwsh: true
-    - task: PowerShell@2
-      displayName: Get Az Version
-      inputs:
-        targetType: 'inline'
-        script: |
-          Write-Host "##vso[task.setvariable variable=azVersion]$(version)"
-          Write-Host "azVersion=$(azVersion)"
-        pwsh: true
     - task: Docker@2
       displayName: "Ubuntu - Build"
       inputs:
