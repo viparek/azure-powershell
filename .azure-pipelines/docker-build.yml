@@ -63,6 +63,7 @@ stages:
     steps:
     - task: ManualValidation@0
       displayName: Waiting for manual validation
+      timeoutInMinutes: 180
       inputs:
         notifyUsers: 'dixue@microsoft.com'
         instructions: 'Please verify compiled docker images.'
