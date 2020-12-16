@@ -65,6 +65,8 @@ stages:
       displayName: Waiting for manual validation
       inputs:
         notifyUsers: 'dixue@microsoft.com'
+        instructions: 'Please verify compiled docker images.'
+        onTimeout: reject
 
 - stage: Publish
   jobs:
