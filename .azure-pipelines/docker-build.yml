@@ -72,7 +72,7 @@ stages:
 
 - stage: Publish
   jobs:
-  - job: Deploy
+  - job: Publish
     steps:
     - checkout: none
     - task: AzureCLI@1
