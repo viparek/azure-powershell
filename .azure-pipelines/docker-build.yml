@@ -58,7 +58,7 @@ stages:
     - task: AzureCLI@1
       displayName: Verify images
       inputs:
-        azureSubscription: $(AzureSubscription)
+        azureSubscription: ${{variables.AzureSubscription}}
         scriptLocation: 'inlineScript'
         failOnStandardError: true
         inlineScript: |
@@ -78,7 +78,7 @@ stages:
     - task: AzureCLI@1
       displayName: Push to public
       inputs:
-        azureSubscription: $(AzureSubscription)
+        azureSubscription: ${{AzureSubscription}}
         scriptLocation: 'inlineScript'
         inlineScript: |
           az acr login --name $(ACRAccount)
@@ -89,7 +89,7 @@ stages:
     - task: AzureCLI@1
       displayName: Tag Latest 
       inputs:
-        azureSubscription: $(AzureSubscription)
+        azureSubscription: ${{AzureSubscription}}
         scriptLocation: 'inlineScript'
         inlineScript: |
           az acr login --name $(ACRAccount)
