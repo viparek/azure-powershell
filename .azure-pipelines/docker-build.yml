@@ -63,8 +63,8 @@ stages:
         failOnStandardError: true
         inlineScript: |
           az acr login --name $(ACRAccount)          
-          actualVersion = $(docker run -it $(ACRServer)/internal/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04 pwsh '(Get-Module Az -ListAvailable).Version.ToString()')
-          if [ "$actualVersion" = "${{parameters.azVersion}}" ]; then
+          actualVersion=$(docker run -it $(ACRServer)/internal/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04 pwsh '(Get-Module Az -ListAvailable).Version.ToString()')
+          if [ "${actualVersion}" = "${{parameters.azVersion}}" ]; then
             echo "Docker image contains expected Az version."
           else
             >&2 echo "Az module or its version is not found"
