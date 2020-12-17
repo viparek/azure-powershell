@@ -63,7 +63,7 @@ stages:
         failOnStandardError: true
         inlineScript: |
           az acr login --name $(ACRAccount)          
-          actualVersion=$(docker run -it $(ACRServer)/internal/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04 pwsh '(Get-Module Az -ListAvailable).Version.ToString()')
+          actualVersion=$(docker run -i $(ACRServer)/internal/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04 pwsh '(Get-Module Az -ListAvailable).Version.ToString()')
           if [ "${actualVersion}" = "${{parameters.azVersion}}" ]; then
             echo "Docker image contains expected Az version."
           else
