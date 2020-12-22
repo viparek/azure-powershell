@@ -58,7 +58,7 @@ stages:
     - task: AzureCLI@1
       displayName: Verify images
       inputs:
-        azureSubscription: $(SDKInfrastructureSP)
+        azureSubscription: ${{variables.SDKInfrastructureSP}}
         scriptLocation: 'inlineScript'
         failOnStandardError: true
         inlineScript: |
