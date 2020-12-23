@@ -55,11 +55,12 @@ stages:
   - job: Test
     steps:
     - checkout: none
-    - task: AzureCLI@1
+    - task: AzureCLI@2
       displayName: Verify images
       inputs:
         azureSubscription: '$(AzureSubscription)'
         scriptLocation: 'inlineScript'
+        scriptType: bash
         inlineScript: |
           az acr login --name $(ACRAccount)          
           actualVersion=`docker run -i $(ACRServer)/internal/azure-powershell:${{parameters.azVersion}}-ubuntu-18.04 pwsh -Command (Get-Module Az -ListAvailable).Version.ToString()`
