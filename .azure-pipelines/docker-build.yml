@@ -58,7 +58,7 @@ stages:
     - task: AzureCLI@1
       displayName: Verify images
       inputs:
-        azureSubscription: '${{ variables.AzureSubscription }}'
+        azureSubscription: '$[variables.AzureSubscription]'
         scriptLocation: 'inlineScript'
         failOnStandardError: true
         inlineScript: |
