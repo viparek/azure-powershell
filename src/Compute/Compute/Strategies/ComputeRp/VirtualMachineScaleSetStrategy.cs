@@ -62,7 +62,8 @@ namespace Microsoft.Azure.Commands.Compute.Strategies.ComputeRp
             string[] scaleInPolicy,
             bool doNotRunExtensionsOnOverprovisionedVMs,
             bool encryptionAtHost,
-            int? platformFaultDomainCount)
+            int? platformFaultDomainCount,
+            string orchestrationMode)
             => Strategy.CreateResourceConfig(
                 resourceGroup: resourceGroup,
                 name: name,
@@ -136,7 +137,8 @@ namespace Microsoft.Azure.Commands.Compute.Strategies.ComputeRp
                     {
                         Rules = scaleInPolicy
                     },
-                    DoNotRunExtensionsOnOverprovisionedVMs = doNotRunExtensionsOnOverprovisionedVMs ? true : (bool?)null
+                    DoNotRunExtensionsOnOverprovisionedVMs = doNotRunExtensionsOnOverprovisionedVMs ? true : (bool?)null,
+                    OrchestrationMode = (orchestrationMode == null) ? null : OrchestrationMode.Parse(typeof(enum), orchestrationMode)
                 });
     }
 }
