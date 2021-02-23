@@ -247,7 +247,14 @@ namespace Microsoft.Azure.Commands.Compute.Automation
         [Parameter(
             Mandatory = false,
             ValueFromPipelineByPropertyName = true)]
-        public SwitchParameter EncryptionAtHost { get; set; } 
+        public SwitchParameter EncryptionAtHost { get; set; }
+
+        [Parameter(
+            Mandatory = false,
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "Specifies the orchestration mode for the virtual machine scale set.")]
+        [PSArgumentCompleter("Uniform", "Flexible")]
+        public string OrchestrationMode { get; set; }
 
         protected override void ProcessRecord()
         {
@@ -622,6 +629,11 @@ namespace Microsoft.Azure.Commands.Compute.Automation
                 }
             }
 
+            if (this.IsParameterBound(c => c.OrchestrationMode))
+            {
+
+            }
+
             var vVirtualMachineScaleSet = new PSVirtualMachineScaleSet
             {
                 Overprovision = this.IsParameterBound(c => c.Overprovision) ? this.Overprovision : (bool?)null,
@@ -641,6 +653,7 @@ namespace Microsoft.Azure.Commands.Compute.Automation
                 AdditionalCapabilities = vAdditionalCapabilities,
                 ScaleInPolicy = vScaleInPolicy,
                 Identity = vIdentity,
+                OrchestrationMode = this.IsParameterBound(c => c.OrchestrationMode) ? (OrchestrationMode)Enum.Parse(typeof(OrchestrationMode), this.OrchestrationMode, false) : (OrchestrationMode?)null
             };
 
             WriteObject(vVirtualMachineScaleSet);
