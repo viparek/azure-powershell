@@ -19,6 +19,17 @@
 -->
 ## Current Release
 
+## Version 6.2.2
+* This module is outdated and will go out of support on 29 February 2024.
+* The Az.DataLakeStore module has all the capabilities of AzureRM.DataLakeStore and provides the following improvements:
+    - Greater security with token cache encryption and improved authentication.
+    - Availability in Azure Cloud Shell and on Linux and macOS.
+    - Support for all Azure services.
+    - Allows use of Azure access tokens.
+* We encourage you to start using the Az module as soon as possible to take advantage of these improvements.
+* [Update your scripts](https://docs.microsoft.com/powershell/azure/migrate-from-azurerm-to-az) that use AzureRM PowerShell modules to use Az PowerShell modules by 29 February 2024.
+* To automatically update your scripts, follow the [quickstart guide](https://docs.microsoft.com/powershell/azure/quickstart-migrate-azurerm-to-az-automatically).
+
 ## Version 6.2.1
 * Update the DataLake package to 1.1.10.
 * Add default Concurrency to multithreaded operations.

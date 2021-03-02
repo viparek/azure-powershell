@@ -19,6 +19,17 @@
 -->
 ## Current Release
 
+## Version 4.12.2
+* This module is outdated and will go out of support on 29 February 2024.
+* The Az.Sql module has all the capabilities of AzureRM.Sql and provides the following improvements:
+    - Greater security with token cache encryption and improved authentication.
+    - Availability in Azure Cloud Shell and on Linux and macOS.
+    - Support for all Azure services.
+    - Allows use of Azure access tokens.
+* We encourage you to start using the Az module as soon as possible to take advantage of these improvements.
+* [Update your scripts](https://docs.microsoft.com/powershell/azure/migrate-from-azurerm-to-az) that use AzureRM PowerShell modules to use Az PowerShell modules by 29 February 2024.
+* To automatically update your scripts, follow the [quickstart guide](https://docs.microsoft.com/powershell/azure/quickstart-migrate-azurerm-to-az-automatically).
+
 ## Version 4.12.0
 * Added new cmdlets for CRUD operations on Azure Sql Database Managed Instance and Azure Sql Managed Database
 	- Get-AzureRmSqlInstance
@@ -277,4 +288,3 @@
     - To configure ReadScale, user simply specify "ReadScale" paramter with "Enabled/Disabled" at database creation with New-AzureRmSqlDatabase cmdlet,
 
 ## Version 2.3.0
-
